@@ -10,16 +10,17 @@ namespace Tele.Bot.Services;
 public class TelegramService : ITelegramService
 {
     // DI сервисы
-    private readonly IRestApiClient _restApiClient;
+    // private readonly ВАШ СЕРВИС
+
     // не забываем добавить их в конструктор
-    public TelegramService(RestApiClient restApiClient)
+    public TelegramService( )
     {
-        _restApiClient = restApiClient;
+
     }
     
     public Task StartBot(CancellationTokenSource cts)
     {
-        var botClient = new TelegramBotClient("token");
+        var botClient = new TelegramBotClient("TOKEN");
 
  
 
@@ -40,6 +41,7 @@ public class TelegramService : ITelegramService
     }
     
     
+    
     private async Task HandleUpdateAsync(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken)
     {
 
@@ -53,6 +55,8 @@ public class TelegramService : ITelegramService
 
 
         // Работа
+        
+        
         if (messageText == "/start")
         {
             await botClient.SendTextMessageAsync(

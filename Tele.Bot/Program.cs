@@ -4,14 +4,14 @@ using Tele.Bot.Services;
 var builder = WebApplication.CreateBuilder(args);
 
 // Dependency Injections here:
-//builder.Services.AddTransient<>();
+// builder.Services.AddTransient<,>();
 
 builder.Services.AddSingleton<ITelegramService, TelegramService>();
 builder.Services.AddTransient<IRestApiClient, RestApiClient>();
 
 builder.Services.AddHttpClient<RestApiClient>(client =>
 {
-    client.BaseAddress = new Uri("https://localhost:7241/");
+    client.BaseAddress = new Uri("BASE URL");
 });
 
 

@@ -6,6 +6,10 @@ public class RestApiClient : IRestApiClient
 {
     private readonly HttpClient _httpClient;
 
+    private readonly JsonSerializerOptions _options = new JsonSerializerOptions
+    {
+        PropertyNameCaseInsensitive = true
+    };
 
     public RestApiClient(HttpClient httpClient)
     {
@@ -15,42 +19,28 @@ public class RestApiClient : IRestApiClient
 
     public async Task<T> SendGetRequest<T>(string url) where T : class, new()
     {
-        var request = new HttpRequestMessage()
-        {
-            Method = HttpMethod.Get,
-            RequestUri = new Uri(url)
-        };
-        
-        var result = await _httpClient.SendAsync(request);
+        var result = await _httpClient.GetAsync(url);
 
         result.EnsureSuccessStatusCode();
             
         var stringJson = await result.Content.ReadAsStringAsync();
 
-        var response = JsonSerializer.Deserialize<T>(stringJson);
+        var response = JsonSerializer.Deserialize<T>(stringJson, _options);
 
         return response;
-
     }
 
     public async Task<T> SendPostRequest<T>(string url, object content) where T : class, new()
     {
         var contentJson = JsonSerializer.Serialize(content);
         
-        var request = new HttpRequestMessage()
-        {
-            Method = HttpMethod.Get,
-            RequestUri = new Uri(url),
-            Content = new StringContent(contentJson)
-        };
-        
-        var result = await _httpClient.SendAsync(request);
+        var result = await _httpClient.PostAsync(url, new StringContent(contentJson));
 
         result.EnsureSuccessStatusCode();
             
         var stringJson = await result.Content.ReadAsStringAsync();
 
-        var response = JsonSerializer.Deserialize<T>(stringJson);
+        var response = JsonSerializer.Deserialize<T>(stringJson, _options);
 
         return response;
     }
