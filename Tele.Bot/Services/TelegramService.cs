@@ -44,10 +44,11 @@ public class TelegramService : ITelegramService
 
         return Task.CompletedTask;
     }
-    
-    
-    
-    private async Task HandleUpdateAsync(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken)
+
+
+
+    private async Task HandleUpdateAsync(ITelegramBotClient botClient, Update update,
+        CancellationToken cancellationToken)
     {
 
         var userId = update.Message.Chat.Id;
@@ -79,34 +80,46 @@ public class TelegramService : ITelegramService
             };
 
             await _rentalDbService.SaveToDb(dbEntity);
-            
+
             //
             await botClient.SendPhotoAsync(
                 chatId: message.Chat.Id,
                 appartment.Image.ThumbnailMedium,
                 caption: $"Appartment name {appartment.Name}  \n with price: {appartment.MaxPrice}",
                 cancellationToken: cancellationToken);
-            
+
+            var mediaGroup = new IAlbumInputMedia[]
+            {
+                new InputMediaPhoto(
+                    new InputMedia("https://cdn.pixabay.com/photo/2017/04/11/21/34/giraffe-2222908_640.jpg")
+                ) { Caption = "ПАчка фоток с жирафами" },
+                new InputMediaPhoto(
+                    new InputMedia("https://cdn.pixabay.com/photo/2017/04/11/21/34/giraffe-2222908_640.jpg"))
+            };
+
+            await botClient.SendMediaGroupAsync(
+                message.Chat.Id,
+                media: mediaGroup,
+                cancellationToken: cancellationToken);
         }
-    
+
     }
 
 
-    
-    
-    
+
+
     // Не трогаем, это метотд обработки ошибок. Выводит в консоль ошибку, если она произошла
-    private async Task HandlePollingErrorAsync(ITelegramBotClient botClient, Exception exception,
-        CancellationToken cancellationToken)
-    {
-        var errorMessage = exception switch
+        private async Task HandlePollingErrorAsync(ITelegramBotClient botClient, Exception exception,
+            CancellationToken cancellationToken)
         {
-            ApiRequestException apiRequestException
-                => $"Telegram API Error:\n[{apiRequestException.ErrorCode}]\n{apiRequestException.Message}",
-            _ => exception.ToString()
-        };
+            var errorMessage = exception switch
+            {
+                ApiRequestException apiRequestException
+                    => $"Telegram API Error:\n[{apiRequestException.ErrorCode}]\n{apiRequestException.Message}",
+                _ => exception.ToString()
+            };
 
-        Console.WriteLine(errorMessage);
+            Console.WriteLine(errorMessage);
 
-    }
+        }
 }
